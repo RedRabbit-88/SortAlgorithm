@@ -62,3 +62,30 @@
 		}
 	}
 ```
+
+## 3. 버블 정렬 (Bubble Sort)
+### 개념
+* 루프를 돌며 n번째와 n+1번째 요소를 비교해서 순서를 정렬하는 정렬
+* 마치 Bubble과 같이 매 루프 수행 시마다 최대값이 가장 뒤로 정렬되는 구조
+* 시간 복잡도
+   * Best : O(n2)
+   * Average : O(n2)
+   * Worst : O(n2)
+
+### 알고리즘
+1. 첫번째 요소부터 루프 시작
+2. 바로 뒤에 요소보다 값이 클 경우 서로 위치 변경. 마지막 요소까지 반복
+3. 1~2를 반복. n회 반복 시마다 배열 length - n번까지만 비교
+```
+	private static void bubbleSort(int[] intArr) {
+		for (int out = intArr.length - 1; out > 0; out--) {
+			for (int in = 0; in < out; in++) {
+				if (intArr[in] > intArr[in + 1]) {
+					int temp = intArr[in];
+					intArr[in] = intArr[in + 1];
+					intArr[in + 1] = temp;
+				}
+			}
+		}
+	}
+```
