@@ -148,3 +148,124 @@
 		return low;
 	}
 ```
+
+## 5. 합병 정렬 (Merge Sort)
+### 개념
+* 분할 정복 알고리즘의 하나로 매우 빠른 속도를 자랑하며 안정 정렬이다
+* 배열의 길이가 0 또는 1이면 이미 정렬된 걸로 가정
+* 그렇지 않은 경우에는 배열을 절반으로 잘라 2개로 분할한다.
+* 각각 분할된 배열을 재귀함수를 이용하여 합병하며 정렬한다.
+* 시간 복잡도
+   * Best : O(nlogn)
+   * Average : O(nlogn)
+   * Worst : O(n2)
+
+### 알고리즘
+1. 분할된 배열의 중간값을 산출
+2. 왼쪽부터 중간값, 중간값+1부터 오른쪽으로 배열을 나누는 재귀함수 호출
+3. 1~2를 반복. 더 이상 분할할 수 없을 경우 합병 과정을 재귀함수로 수행
+4. 중간값을 기준으로 왼쪽과 오른쪽 요소들을 하나씩 비교해가며 임시 배열에 입력
+5. 합병 함수에서 정렬할 수 있는 모든 값이 임시 배열에 정렬된 후 원래 배열에 입력
+```
+	/**
+	 * Merge Sort 구현
+	 * 1. 분할된 배열의 중간값을 산출
+	 * 2. 왼쪽부터 중간값, 중간값+1부터 오른쪽으로 배열을 나눠서 mergeSort 호출 (재귀)
+	 * 3. 1~2를 반복. 더 이상 분할할 수 없을 경우 종료
+	 * 
+	 * @param intArr
+	 * @param left
+	 * @param right
+	 */
+	private static void mergeSort(int[] intArr, int left, int right) {
+		// left가 right보다 작으면 분할 작업 수행
+		// left = right가 되는 순간 중지 = 더 이상 쪼개질 수 없을 때까지
+		if (left < right) {
+			int mid = (left + right) / 2; // 분할을 위한 중간값 계산
+			mergeSort(intArr, left, mid); // 왼쪽부터 중간값까지 분할
+			mergeSort(intArr, mid + 1, right); // 중간값+1부터 오른쪽까지 분할
+			merge(intArr, left, mid, right); // 정렬 및 merge 작업 수행
+		}
+	}
+	
+	/**
+	 * mergeSort에서 호출되는 merge 함수
+	 * 1. merge함수는 더 이상 배열을 분할할 수 없을 때부터 작동하기 시작
+	 * 2. mergeSort(2, 2) 와 같이 left/right가 동일할 경우에는 아무런 동작을 안 함
+	 * 3. mergeSort(2, 3) 와 같이 left/right가 다를 경우 동작
+	 * 4. 중간값을 기준으로 왼쪽과 오른쪽 요소들을 하나씩 비교해가며 임시 배열에 입력
+	 * 5. 해당 merge 함수에서 정렬할 수 있는 모든 값이 임시 배열에 정렬된 후 원래 배열에 입력
+	 * 
+	 * Ex1 mergeSort(0, 1)에서 merge(0, 0, 1)가 호출됨
+	 *     1) 중간값은 0번째 요소로 가정
+	 *     2) 왼쪽 요소 시작은 0번째 부터
+	 *     3) 오른쪽 요소 시작은 중간값+1인 1번째 부터
+	 *     > 즉 0번째와 1번째를 비교해서 더 작은 값을 먼저 임시 배열에 입력
+	 * 
+	 * Ex2 mergeSort(0, 2)에서 merge(0, 1, 2)가 호출됨
+	 *     1) 중간값은 1번째 요소로 가정
+	 *     2) 왼쪽 요소 시작은 0번째 부터
+	 *     3) 오른쪽 요소 시작은 중간값+1인 2번째 부터
+	 *     > 즉 0번째와 2번째를 비교해서 더 작은 값을 먼저 임시 배열에 입력
+	 *     > 해당 함수는 Ex1의 merge(0, 0, 1)이 호출된 후에 호출되므로 이미 0/1번째는 정렬이 완료된 후 호출
+	 * 
+	 * [호출 순서]
+	 * mergeSort(0, 8)			// 17 - merge(0, 4, 8) : 0~8번 정렬
+	 *   mergeSort(0, 4)			// 15 - merge(0, 2, 4) : 0~4번 정렬
+	 *     mergeSort(0, 2)				// 11 - merge(0, 1, 2) : 0~2번 정렬
+	 *       mergeSort(0, 1) 				// 9 - merge(0, 0, 1) : 0~1번 정렬
+	 *         mergeSort(0, 0)					// 1 - merge(0, 0, 0) : 아무런 동작 안 함
+	 *         mergeSort(1, 1)					// 2 - merge(1, 1, 1) : 아무런 동작 안 함
+	 *       mergeSort(2, 2) 				// 10 - merge(2, 2, 2) : 아무런 동작 안 함
+	 *     mergeSort(3, 4)				// 12 - merge(3, 3, 4) : 3~4번 정렬
+	 *       mergeSort(3, 3)					// 3 - merge(3, 3, 3) : 아무런 동작 안 함
+	 *       mergeSort(4, 4)					// 4 - merge(4, 4, 4) : 아무런 동작 안 함
+	 *   mergeSort(5, 8)			// 16 - merge(5, 6, 8) : 5~8번 정렬
+	 *     mergeSort(5, 6)				// 13 - merge(5, 5, 6) : 5~6번 정렬
+	 *       mergeSort(5, 5)					// 5 - merge(0, 0, 0) : 아무런 동작 안 함
+	 *       mergeSort(6, 6)					// 6 - merge(0, 0, 0) : 아무런 동작 안 함
+	 *     mergeSort(7, 8)				// 14 - merge(7, 7, 8) : 7~8번 정렬
+	 *       mergeSort(7, 7)					// 7 - merge(7, 7, 7) : 아무런 동작 안 함
+	 *       mergeSort(8, 8)					// 8 - merge(8, 8, 8) : 아무런 동작 안 함
+	 * 
+	 * @param intArr
+	 * @param left
+	 * @param mid
+	 * @param right
+	 * @return
+	 */
+	private static void merge(int[] intArr, int left, int mid, int right) {
+		// 요소를 정렬해서 담아둘 임시 배열
+		int[] temp = new int[intArr.length];
+		
+		int tmpIdx = left;	// 임시 배열에 요소를 입력하는 초기 위치
+		int l = left;		// 왼쪽 기준값
+		int r = mid + 1;	// 오른쪽 기준값
+		
+		// 왼쪽 기준값이 중간값에 도달하거나 중간값이 오른쪽 끝 값에 도달할 때까지 반복
+		while (l <= mid && r <= right) {
+			if (intArr[l] <= intArr[r]) { // 왼쪽/오른쪽 값을 비교
+				temp[tmpIdx++] = intArr[l++]; // 왼쪽값이 작을 경우 임시 배열에 왼쪽값 입력
+			} else {
+				temp[tmpIdx++] = intArr[r++]; // 오른쪽값이 작을 경우 임시 배열에 오른쪽값 입력
+			}
+		}
+		
+		// 만약 중간값 기준 오른쪽 요소들이 전부 임시 배열에 들어간 경우
+		// 남아 있는 왼쪽 요소들을 임시 배열에 입력
+		while (l <= mid) {
+			temp[tmpIdx++] = intArr[l++];
+		}
+		
+		// 만약 중간값 기준 왼쪽 요소들이 전부 임시 배열에 들어간 경우
+		// 남아 있는 오른쪽 요소들을 임시 배열에 입력
+		while (r <= right) {
+			temp[tmpIdx++] = intArr[r++];
+		}
+		
+		// 임시배열에 저장된 값들을 원래 배열에 입력
+		for (int i = left; i <= right; i++) {
+			intArr[i] = temp[i]; 
+		}
+	}
+```
