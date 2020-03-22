@@ -89,3 +89,58 @@
 		}
 	}
 ```
+
+## 4. 퀵 정렬 (Quick Sort)
+### 개념
+* 분할 정복 알고리즘의 하나로 매우 빠른 속도를 자랑하지만, 불안정 정렬이다.
+* 합병 정렬(Merge Sort)와 달리 퀵 정렬은 배열을 "불균등"하게 분할한다.
+* 배열에 있는 하나의 요소를 골라 pivot이라 지정.
+* pivot을 기준으로 왼쪽은 pivot보다 작은 값, 오른쪽은 pivot보다 큰 값을 정렬.
+* 정렬이 완료되면 pivot을 기준으로 배열을 분할해서 동일 작업 수행
+
+### 알고리즘
+1. left/right의 중앙에 있는 값을 pivot으로 사용
+2. left부터 우측으로 pivot과 비교하면서 pivot보다 "큰" 값을 찾음.
+3. right부터 좌측으로 pivot과 비교하면서 pivot보다 "작은" 값을 찾음.
+4. 2/3번에서 구한 값을 swap
+5. 1~4를 반복
+* 4번에서 값이 swap되었기 때문에 2번에서 찾은 pivot보다 "큰" 값은 pivot의 우측에, 3번에서 찾은 pivot보다 "작은" 값은 pivot의 좌측으로 이동함.
+* 이후 계속해서 pivot 좌측에서 pivot보다 "큰" 값과 pivot 우측에서 pivot보다 "작은" 값을 찾아서 swap 작업 수행.
+* 더 이상 pivot을 기준으로 정렬될 값이 없을 때까지 계속
+```
+	private static void quickSort(int[] intArr, int left, int right) {
+		if (left < right) { // 더 이상 분할할 값이 없을 경우 종료
+			// 분할된 배열로 정렬작업 수행
+			int pivot = partition(intArr, left, right);
+			
+			quickSort(intArr, left, pivot - 1);  // 분할된 배열의 좌측부터 pivot 전까지로 분할
+			quickSort(intArr, pivot + 1, right); // 분할된 배열의 pivot 다음부터 우측 끝까지로 분할
+		}
+	}
+	
+	private static int partition(int[] intArr, int left, int right) {
+		int low = left;		// 좌측 끝값
+		int high = right;	// 우측 끝값
+		int pivot = intArr[(low + high) / 2]; // 중간값을 pivot으로 설정
+		
+		while (low < high) { // 정렬할 값들이 존재할 때
+			// 좌측 끝부터 pivot까지 pivot보다 큰 값을 찾음
+			while (low <= right && intArr[low] < pivot) {
+				low++;
+			}
+			// 우측 끝부터 pivot까지 pivot보다 작은 값을 찾음
+			while (high >= left && intArr[high] > pivot) {
+				high--;
+			}
+			// pivot 기준으로 좌측에서 pivot보다 큰 값과 우측에서 pivot보다 작은 값이 존재할 경우
+			// 두 값을 swap
+			if (low < high) {
+				int temp = intArr[high];
+				intArr[high] = intArr[low];
+				intArr[low] = temp;
+			}
+		}
+		
+		return low;
+	}
+```
