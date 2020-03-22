@@ -97,6 +97,10 @@
 * 배열에 있는 하나의 요소를 골라 pivot이라 지정.
 * pivot을 기준으로 왼쪽은 pivot보다 작은 값, 오른쪽은 pivot보다 큰 값을 정렬.
 * 정렬이 완료되면 pivot을 기준으로 배열을 분할해서 동일 작업 수행
+* 시간 복잡도
+   * Best : O(nlogn)
+   * Average : O(nlogn)
+   * Worst : O(n2)
 
 ### 알고리즘
 1. left/right의 중앙에 있는 값을 pivot으로 사용
