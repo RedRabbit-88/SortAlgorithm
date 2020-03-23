@@ -15,18 +15,21 @@
 3. 기준값보다 작은 요소를 찾으면 해당 요소 바로 뒤로 기준값 삽입
 4. 1~3을 마지막 요소까지 반복
 ```
-	private static void insertionSort(int[] intArr) {
-		int out, in, key = 0;
+	private static void insertionSort(int[] list) {
+		int key, tgt, seek = 0;
 		
-		for (out = 1; out < intArr.length; out++) { // 2번째 요소부터 시작
-			key = intArr[out]; // 현재 요소를 키값으로 설정
+		for (tgt = 1; tgt < list.length; tgt++) { // 2번째 요소부터 시작
+			key = list[tgt]; // 현재 요소를 키값으로 설정
+			
 			// 첫 번째 요소까지 확인하면서 키값보다 큰 값은 한 칸씩 뒤로 이동.
 			// 키값보다 작은 값을 만났을 때 중지
-			for (in = out - 1; in >= 0 && key < intArr[in]; in--) {
-				intArr[in + 1] = intArr[in];
+			for (seek = tgt - 1; seek >= 0 && list[seek] > key; seek--) {
+				list[seek + 1] = list[seek];
 			}
-			// 키값보다 작은 값 바로 뒤에 키값을 삽입
-			intArr[in + 1] = key;
+			// 키값보다 작은 값 위치에 키값을 삽입
+			list[seek + 1] = key;
+			
+			printList(list);
 		}
 	}
 ```
@@ -46,19 +49,23 @@
 * 마지막 요소까지 확인 후 최소값을 n번째 요소와 swap
 * 1~3을 반복
 ```
-	private static void selectionSort(int[] intArr) {
-		for (int out = 0; out < intArr.length - 1; out++) {
-			int min = out;
-			for (int in = out + 1; in < intArr.length; in++) {
-				if (intArr[in] < intArr[min]) {
-					min = in;
+	private static void selectionSort(int[] list) {
+		for (int i = 0; i < list.length; i++) { // 요소의 개수만큼 루프
+			int key = i; // n번째 위치를 저장
+			
+			// n번째 위치부터 끝까지 가장 작은 값의 위치를 찾기
+			for (int j = i; j < list.length; j++) {
+				if (list[j] < list[key]) {
+					key = j; // 키값보다 작은 값을 찾을 때마다 키값 교체
 				}
 			}
-			if (out != min) {
-				int temp = intArr[out];
-				intArr[out] = intArr[min];
-				intArr[min] = temp;
+			// 키값에 변경이 있었을 경우에만 swap 실행
+			if (i != key) {
+				int tmp = list[i];
+				list[i] = list[key];
+				list[key] = tmp;
 			}
+			printList(list);
 		}
 	}
 ```
@@ -77,15 +84,17 @@
 2. 바로 뒤에 요소보다 값이 클 경우 서로 위치 변경. 마지막 요소까지 반복
 3. 1~2를 반복. n회 반복 시마다 배열 length - n번까지만 비교
 ```
-	private static void bubbleSort(int[] intArr) {
-		for (int out = intArr.length - 1; out > 0; out--) {
-			for (int in = 0; in < out; in++) {
-				if (intArr[in] > intArr[in + 1]) {
-					int temp = intArr[in];
-					intArr[in] = intArr[in + 1];
-					intArr[in + 1] = temp;
+	private static void bubbleSort(int[] list) {
+		for (int i = list.length - 1; i > 0; i--) { // 배열 마지막에서부터 시작
+			// 배열의 첫번째 요소부터 n, n+1번째 요소를 비교하며 n번째 요소가 더 클 경우 swap
+			for (int j = 0; j < i; j++) {
+				if (list[j] > list[j + 1]) {
+					int temp = list[j + 1];
+					list[j + 1] = list[j];
+					list[j] = temp;
 				}
 			}
+			printList(list);
 		}
 	}
 ```
@@ -112,40 +121,36 @@
 * 이후 계속해서 pivot 좌측에서 pivot보다 "큰" 값과 pivot 우측에서 pivot보다 "작은" 값을 찾아서 swap 작업 수행.
 * 더 이상 pivot을 기준으로 정렬될 값이 없을 때까지 계속
 ```
-	private static void quickSort(int[] intArr, int left, int right) {
-		if (left < right) { // 더 이상 분할할 값이 없을 경우 종료
-			// 분할된 배열로 정렬작업 수행
-			int pivot = partition(intArr, left, right);
-			
-			quickSort(intArr, left, pivot - 1);  // 분할된 배열의 좌측부터 pivot 전까지로 분할
-			quickSort(intArr, pivot + 1, right); // 분할된 배열의 pivot 다음부터 우측 끝까지로 분할
-		}
-	}
-	
-	private static int partition(int[] intArr, int left, int right) {
-		int low = left;		// 좌측 끝값
-		int high = right;	// 우측 끝값
-		int pivot = intArr[(low + high) / 2]; // 중간값을 pivot으로 설정
+	private static void quickSort(int[] list, int left, int right) {
+		if (left >= right)
+			return;
+
+		int pivot = list[left]; // 가장 왼쪽의 요소를 pivot으로 사용
+		int low = left + 1; // pivot 다음 요소부터 pivot 보다 큰 값 검색
+		int high = right; // 가장 오른쪽부터 pivot 보다 작은 값 검색
 		
-		while (low < high) { // 정렬할 값들이 존재할 때
-			// 좌측 끝부터 pivot까지 pivot보다 큰 값을 찾음
-			while (low <= right && intArr[low] < pivot) {
+		while (low <= high) { // low, high가 교차하기 전까지 반복 (모든 요소 검색)
+			while (low <= right && list[low] <= pivot) { // 왼쪽부터 pivot보다 큰 값을 찾는다 
 				low++;
 			}
-			// 우측 끝부터 pivot까지 pivot보다 작은 값을 찾음
-			while (high >= left && intArr[high] > pivot) {
+			while (high >= left + 1 && list[high] >= pivot) { // 오른쪽부터 pivot보다 작은 값을 찾는다
 				high--;
 			}
-			// pivot 기준으로 좌측에서 pivot보다 큰 값과 우측에서 pivot보다 작은 값이 존재할 경우
-			// 두 값을 swap
-			if (low < high) {
-				int temp = intArr[high];
-				intArr[high] = intArr[low];
-				intArr[low] = temp;
+			if (low <= high) { // low/high가 아직 교차하지 않았으면 Swap
+				int tmp = list[high];
+				list[high] = list[low];
+				list[low] = tmp;
+			} else { 
+				// low/high 값이 교차했다면 (모든 요소 검색이 끝났다면)
+				// 마지막 high 값은 가장 왼쪽값인 pivot과 교환. pivot값은 가운데가 된다
+				list[left] = list[high];
+				list[high] = pivot;
 			}
 		}
+		printList(list);
 		
-		return low;
+		quickSort(list, left, high - 1);
+		quickSort(list, high + 1, right);
 	}
 ```
 
