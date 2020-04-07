@@ -112,7 +112,7 @@
    * Worst : O(n2)
 
 ### 알고리즘
-1. left/right의 중앙에 있는 값을 pivot으로 사용
+1. left/right사이 임의의 값을 pivot으로 사용
 2. left부터 우측으로 pivot과 비교하면서 pivot보다 "큰" 값을 찾음.
 3. right부터 좌측으로 pivot과 비교하면서 pivot보다 "작은" 값을 찾음.
 4. 2/3번에서 구한 값을 swap
